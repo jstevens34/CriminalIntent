@@ -71,13 +71,15 @@ public class CrimeListFragment extends Fragment {
         if(mAdapter == null){
             mAdapter = new CrimeAdapter(crimes);
             mCrimeRecyclerView.setAdapter(mAdapter);
-        }else {
+        }else{
+            mAdapter.notifyDataSetChanged();
+         /*{
             if(mLastAdapterClickPosition < 0){
                 mAdapter.notifyDataSetChanged();
             }else{
                 mAdapter.notifyItemChanged(mLastAdapterClickPosition);
                 mLastAdapterClickPosition = -1;
-            }
+            }*/
         }
 
         updateSubtitle();
