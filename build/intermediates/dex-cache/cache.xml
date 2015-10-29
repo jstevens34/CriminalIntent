@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\Android\android-sdk\extras\android\m2repository\com\android\support\support-annotations\23.0.1\support-annotations-23.0.1.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="1fce89a6428c51467090d7f424e4c9c3dbd55f7e">
+        <dex dex="C:\Users\Joe\AndroidStudioProjects\CrimeActivity\app\build\intermediates\pre-dexed\debug\support-annotations-23.0.1-0eaca7dae6dc351e9dea499ae761d83c42c35b04.jar" />
+    </item>
+    <item
+        jar="C:\Users\Joe\AndroidStudioProjects\CrimeActivity\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\23.0.1\jars\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4356e230a981d1bbf047d848b91bc0d9b7c5bacc">
+        <dex dex="C:\Users\Joe\AndroidStudioProjects\CrimeActivity\app\build\intermediates\pre-dexed\debug\classes-8f952c9edf77f6c0b705f751a9c53375d640768c.jar" />
+    </item>
+    <item
+        jar="C:\Users\Joe\AndroidStudioProjects\CrimeActivity\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.0.1\jars\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="d86429b0f0b3f3cafbeb78dda1b9d89119ccb05d">
+        <dex dex="C:\Users\Joe\AndroidStudioProjects\CrimeActivity\app\build\intermediates\pre-dexed\debug\classes-73c9574466ca0d92dff16b0dac69661e4fdee0b7.jar" />
+    </item>
+    <item
+        jar="C:\Users\Joe\AndroidStudioProjects\CrimeActivity\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.0.1\jars\libs\internal_impl-23.0.1.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="aa92916125166649d8ad4ba3940c3dd7515596d3">
+        <dex dex="C:\Users\Joe\AndroidStudioProjects\CrimeActivity\app\build\intermediates\pre-dexed\debug\internal_impl-23.0.1-71820e3432895e08994744363a5c05809c0760df.jar" />
+    </item>
+    <item
+        jar="C:\Users\Joe\AndroidStudioProjects\CrimeActivity\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.0.1\jars\classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="c31e21b53ff2f74664e498248d01453a32e32d48">
+        <dex dex="C:\Users\Joe\AndroidStudioProjects\CrimeActivity\app\build\intermediates\pre-dexed\debug\classes-d887b7cf8517a57612b31dd457afb9a6ab9b7df1.jar" />
+    </item>
+
+</items>
