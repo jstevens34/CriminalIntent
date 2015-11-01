@@ -98,6 +98,7 @@ public class CrimeListFragment extends Fragment {
                     createCrime();
                 }
             });
+            mEmptyCrimeLayout.setVisibility(View.VISIBLE);
         }else {
             mEmptyCrimeLayout.setVisibility(View.GONE);
         }
