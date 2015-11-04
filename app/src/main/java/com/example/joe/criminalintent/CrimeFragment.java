@@ -122,6 +122,13 @@ public class CrimeFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        CrimeLab.get(getActivity()).updateCrime(mCrime);
+    }
+
     private void updateTime() {
         mTimeButton.setText(DateFormat.format("h:mm a", mCrime.getDate()));
     }
