@@ -1,5 +1,6 @@
 package com.example.joe.criminalintent;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,11 +9,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.ShareCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.CursorLoader;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +30,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.Date;
 import java.util.UUID;
@@ -49,6 +57,9 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckBox;
     private Button mReportButton;
     private Button mSuspectButton;
+    private Button mCallSuspectButton;
+
+    private static String[] PERMISSIONS_CONTACT = {Manifest.permission.READ_CONTACTS};
 
     public static CrimeFragment newInstance(UUID crimeId){
         Bundle args = new Bundle();
@@ -129,12 +140,20 @@ public class CrimeFragment extends Fragment {
         mReportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Intent.ACTION_SEND);
+                /*Intent i = new Intent(Intent.ACTION_SEND);
                 i.setType("text/plain");
                 i.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
                 i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
                 i = Intent.createChooser(i, getString(R.string.send_report));
-                startActivity(i);
+                startActivity(i);*/
+                ShareCompat.IntentBuilder.from(getActivity())
+                        .setType("text/plain")
+                        .setText(getCrimeReport())
+                        .setSubject(getString(R.string.crime_report_subject))
+                        .setChooserTitle(R.string.send_report)
+                        .startChooser();
+
+
             }
         });
 
@@ -148,8 +167,31 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+
+        mCallSuspectButton = (Button) v.findViewById(R.id.call_suspect);
+        mCallSuspectButton.setEnabled(false);
+        mCallSuspectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(ContextCompat.checkSelfPermission(getActivity(),
+                        Manifest.permission.READ_CONTACTS)
+                        != PackageManager.PERMISSION_GRANTED){
+
+                    Log.i(TAG, "Contact permissions has NOT been granted. Requesting permissions.");
+                    requestContactsPermissions();
+                }else {
+                    Log.i(TAG,
+                            "Contact permissions have already been granted. Displaying contact details.");
+
+                    callSuspect();
+                }
+
+            }
+        });
+
         if(mCrime.getSuspect() != null){
             mSuspectButton.setText(mCrime.getSuspect());
+            updateCallSuspectButton();
         }
 
         PackageManager packageManager = getActivity().getPackageManager();
@@ -158,7 +200,58 @@ public class CrimeFragment extends Fragment {
             mSuspectButton.setEnabled(false);
         }
 
+
         return v;
+    }
+
+    private void requestContactsPermissions() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                Manifest.permission.READ_CONTACTS)) {
+
+            Log.i(TAG,
+                    "Displaying contacts permission rationale to provide additional context.");
+
+            Toast.makeText(getActivity(), "Permission Available", Toast.LENGTH_SHORT);
+            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS_CONTACT, REQUEST_CONTACT);
+        }else {
+            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS_CONTACT, REQUEST_CONTACT);
+        }
+    }
+
+    private void callSuspect() {
+        Log.i(TAG, "call suspect started");
+        Uri contentUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+
+        String selectClause = ContactsContract.CommonDataKinds.Phone._ID + " = ?";
+
+        String[] fields = {ContactsContract.CommonDataKinds.Phone.NUMBER};
+        String[] selectParams = {Long.toString(mCrime.getContactId())};
+
+        Cursor cursor = getActivity().getContentResolver().query(contentUri, fields, selectClause, selectParams, null);
+        //Cursor cursor = new CursorLoader(getActivity(), contentUri, fields,
+          //      null, null, null);
+
+        if(cursor != null && cursor.getCount() > 0)
+        {
+            try
+            {
+                cursor.moveToFirst();
+
+                String number = cursor.getString(0);
+
+                Uri phoneNumber = Uri.parse("tel:" + number);
+
+                Intent intent = new Intent(Intent.ACTION_DIAL, phoneNumber);
+
+                startActivity(intent);
+
+                Log.i(TAG, "intent started");
+            }
+            finally
+            {
+                cursor.close();
+            }
+        }
     }
 
     @Override
@@ -223,7 +316,8 @@ public class CrimeFragment extends Fragment {
             // Specify which fields you want your query to return
             //values for
             String[] queryFields = new String[]{
-                    ContactsContract.Contacts.DISPLAY_NAME
+                    ContactsContract.Contacts.DISPLAY_NAME,
+                    ContactsContract.Contacts._ID
             };
             // Perform your query - the contactUri is like a "where"
             //clause here
@@ -240,13 +334,22 @@ public class CrimeFragment extends Fragment {
                 // that is your suspect's name.
                 c.moveToFirst();
                 String suspect = c.getString(0);
+                long contactId = c.getLong(1);
                 mCrime.setSuspect(suspect);
+                mCrime.setContactId(contactId);
                 mSuspectButton.setText(suspect);
+
+                updateCallSuspectButton(); //enables the button and changes its text
+
             }finally {
                 c.close();
             }
         }
 
+    }
+
+    private void updateCallSuspectButton() {
+        mCallSuspectButton.setEnabled(true);
     }
 
     @Override
@@ -264,6 +367,30 @@ public class CrimeFragment extends Fragment {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_CONTACT) {
+            Log.i(TAG, "Received response for contact permissions request.");
+
+            // We have requested multiple permissions for contacts, so all of them need to be
+            // checked.
+            /*if (PermissionUtil.verifyPermissions(grantResults)) {
+                // All required permissions have been granted, display contacts fragment.
+                Snackbar.make(mLayout, R.string.permision_available_contacts,
+                        Snackbar.LENGTH_SHORT)
+                        .show();
+            } else {
+                Log.i(TAG, "Contacts permissions were NOT granted.");
+                Snackbar.make(mLayout, R.string.permissions_not_granted,
+                        Snackbar.LENGTH_SHORT)
+                        .show();
+            }*/
+
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 }
