@@ -26,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -242,11 +243,18 @@ public class CrimeFragment extends Fragment {
                 }
             }
         });
-        try {
-            updatePhotoView();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        mPhotoView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                try {
+                    updatePhotoView(mPhotoView);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
 
         return v;
     }
@@ -339,12 +347,18 @@ public class CrimeFragment extends Fragment {
         return report;
     }
 
-    private void updatePhotoView() throws IOException {
+    private void updatePhotoView(ImageView container) throws IOException {
         if (mPhotoFile == null || !mPhotoFile.exists()){
             mPhotoView.setImageDrawable(null);
         }else {
-            Bitmap bitmap = PictureUtils.getScaledBitmap(
-                    mPhotoFile.getPath(), getActivity());
+            Bitmap bitmap;
+
+            if(container == null){
+                bitmap = PictureUtils.getScaledBitmap(
+                        mPhotoFile.getPath(), getActivity());
+            }else{
+                bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), container);
+            }
             mPhotoView.setImageBitmap(bitmap);
         }
     }
@@ -402,7 +416,7 @@ public class CrimeFragment extends Fragment {
             }
         }else  if (requestCode == REQUEST_PHOTO){
             try {
-                updatePhotoView();
+                updatePhotoView(mPhotoView);
             } catch (IOException e) {
                 e.printStackTrace();
             }

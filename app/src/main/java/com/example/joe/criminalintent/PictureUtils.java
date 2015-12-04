@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.media.ExifInterface;
+import android.view.View;
 
 import java.io.IOException;
 
@@ -71,5 +72,9 @@ public class PictureUtils {
         //Read in and create final bitmap
         return BitmapFactory.decodeFile(path, options);
 
+    }
+
+    public static Bitmap getScaledBitmap(String path, View container){
+        return getScaledBitmap(path, container.getWidth(), container.getHeight());
     }
 }
