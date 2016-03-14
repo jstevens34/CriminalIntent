@@ -1,5 +1,6 @@
 package com.example.joe.criminalintent;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -34,7 +35,28 @@ public class CrimeListFragment extends Fragment {
     private CrimeAdapter mAdapter;
     private boolean mSubtitleVisible;
 
+    private Callacks mCallbacks;
+
     private LinearLayout mEmptyCrimeLayout;
+
+    /**
+     * Required interface for hosting activities.
+     */
+    public interface Callacks{
+        void onCrimeSelected(Crime crime, int request);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallbacks = (Callacks) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -139,8 +161,9 @@ public class CrimeListFragment extends Fragment {
         public void onClick(View v) {
             mLastAdapterClickPosition = getAdapterPosition();
             //Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getID());
-            Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getID());
-            startActivityForResult(intent, REQUEST_CRIME);
+            //Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getID());
+            //startActivityForResult(intent, REQUEST_CRIME);
+            mCallbacks.onCrimeSelected(mCrime, REQUEST_CRIME);
         }
     }
 
@@ -215,9 +238,11 @@ public class CrimeListFragment extends Fragment {
     private void createCrime() {
         Crime crime = new Crime();
         CrimeLab.get(getActivity()).addCrime(crime);
-        Intent intent = CrimePagerActivity.newIntent(getActivity(),
+        /*Intent intent = CrimePagerActivity.newIntent(getActivity(),
                 crime.getID());
-        startActivity(intent);
+        startActivity(intent);*/
+        updateUI();
+        mCallbacks.onCrimeSelected(crime, REQUEST_CRIME);
     }
 
     private void updateSubtitle(){
