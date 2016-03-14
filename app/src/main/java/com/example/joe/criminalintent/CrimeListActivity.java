@@ -7,7 +7,8 @@ import android.support.v4.app.Fragment;
  * Created by Joe on 10/10/2015.
  */
 public class CrimeListActivity extends SingleFragmentActivity
-    implements  CrimeListFragment.Callacks{
+    implements  CrimeListFragment.Callacks,
+    CrimeFragment.Callbacks{
 
     @Override
     protected Fragment createFragment() {
@@ -31,5 +32,13 @@ public class CrimeListActivity extends SingleFragmentActivity
                     .replace(R.id.detail_fragment_container, newDetail)
                     .commit();
         }
+    }
+
+    @Override
+    public void onCrimeUpdated(Crime crime) {
+        CrimeListFragment listFragment = (CrimeListFragment)
+                getSupportFragmentManager()
+                        .findFragmentById(R.id.fragment_container);
+        listFragment.updateUI();
     }
 }
